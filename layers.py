@@ -12,3 +12,11 @@ class Dense:
         self.dweights = np.dot(self.inputs.T, dvalues)
         self.dbiases = np.sum(dvalues, axis=0, keepdims=True)
         self.dinputs = np.dot(dvalues, self.weights.T)
+
+class ReLU:
+    def forward(self, inputs):
+        self.inputs = inputs
+        self.output = np.maximum(0, inputs)
+        return self.output
+    def backward(self, dvalues):
+        self.dinputs = dvalues * (self.inputs > 0)
