@@ -1,7 +1,3 @@
-import numpy as np
-from layers import Dense, ReLU
-from losses import Softmax_CrossEntropy
-
 class Network:
     def __init__(self, layers):
         self.layers = layers
