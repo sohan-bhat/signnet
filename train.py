@@ -1,16 +1,14 @@
 import numpy as np
 from data import get_data
-from layers import Dense, ReLU
+from layers import Conv, Dense, Flatten, MaxPool, ReLU
 from losses import Softmax_CrossEntropy
 from network import Network
 
 print("Loading data...")
 X_train, y_train, X_test, y_test = get_data()
-X_train = X_train.reshape(X_train.shape[0], -1)
-X_test = X_test.reshape(X_test.shape[0], -1)
 
 print("Building network...")
-layers = [Dense(3072, 128), ReLU(), Dense(128, 43)]
+layers = [Conv(8, 3, 3), ReLU(), MaxPool(2), Flatten(), Dense(1800, 128), ReLU(), Dense(128, 43)]
 network = Network(layers)
 cross_entropy = Softmax_CrossEntropy()
 
@@ -38,6 +36,5 @@ def train(learning_rate, epochs, batch_size):
         train_acc = np.mean(train_preds == y_train)*100
         test_acc = np.mean(test_preds == y_test)*100
         print(f"{i+1:>6} | {train_acc:>6.2f}% | {test_acc:>6.2f}% | {loss:>8.4f}")
-
-train(0.05, 100, 64)
+train(0.01, 10, 64)
 network.save("model.npz")
