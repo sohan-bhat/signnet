@@ -8,7 +8,7 @@ print("Loading data...")
 X_train, y_train, X_test, y_test = get_data()
 
 print("Building network...")
-layers = [Conv(8, 3, 3), ReLU(), MaxPool(2), Flatten(), Dense(1800, 128), ReLU(), Dense(128, 43)]
+layers = [Conv(32, 3, 3), ReLU(), MaxPool(2), Flatten(), Dense(7200, 128), ReLU(), Dense(128, 43)]
 network = Network(layers)
 cross_entropy = Softmax_CrossEntropy()
 
@@ -17,6 +17,8 @@ def train(learning_rate, epochs, batch_size):
     print(f"{'Epoch':>6} | {'Train':>7} | {'Test':>7} | {'Loss':>8}")
     print("-" * 38)
     for i in range(epochs):
+        if i % 5 == 0:
+            network.save("model.npz")
         loss = 0
         indices = np.random.permutation(X_train.shape[0])
         X_shuffled = X_train[indices]
@@ -36,5 +38,5 @@ def train(learning_rate, epochs, batch_size):
         train_acc = np.mean(train_preds == y_train)*100
         test_acc = np.mean(test_preds == y_test)*100
         print(f"{i+1:>6} | {train_acc:>6.2f}% | {test_acc:>6.2f}% | {loss:>8.4f}")
-train(0.01, 10, 64)
+train(0.01, 50, 64)
 network.save("model.npz")
