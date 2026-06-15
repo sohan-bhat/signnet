@@ -5,20 +5,37 @@ from losses import Softmax_CrossEntropy
 from network import Network
 
 print("Loading data...")
-X_train, y_train, X_test, y_test = get_data()
+X_train, y_train, X_test, y_test = get_data() 
 
 print("Building network...")
-layers = [Conv(32, 3, 3), ReLU(), MaxPool(2), Flatten(), Dense(7200, 128), ReLU(), Dense(128, 43)]
+layers = [
+    Conv(32, 3, 3), ReLU(), MaxPool(2),
+    Conv(64, 3, 32), ReLU(), MaxPool(2),
+    Flatten(),
+    Dense(2304, 128), ReLU(),
+    Dense(128, 43)
+]
 network = Network(layers)
+network.load("models/model.npz")
 cross_entropy = Softmax_CrossEntropy()
+
+def evaluate(X, y, batch_size=64):
+    correct = 0
+    for start in range(0, X.shape[0], batch_size):
+        X_batch = X[start:start+batch_size]
+        y_batch = y[start:start+batch_size]
+        preds = np.argmax(network.forward(X_batch), axis=1)
+        correct += np.sum(preds == y_batch)
+    return correct / X.shape[0] * 100
+print(evaluate(X_test, y_test))
+
 
 def train(learning_rate, epochs, batch_size):
     print(f"Training: {epochs} epochs, batch {batch_size}, lr {learning_rate}\n")
     print(f"{'Epoch':>6} | {'Train':>7} | {'Test':>7} | {'Loss':>8}")
     print("-" * 38)
+    max_acc = 0
     for i in range(epochs):
-        if i % 5 == 0:
-            network.save("model.npz")
         loss = 0
         indices = np.random.permutation(X_train.shape[0])
         X_shuffled = X_train[indices]
@@ -33,10 +50,12 @@ def train(learning_rate, epochs, batch_size):
             for layer in network.parameters():
                 layer.weights -= learning_rate * layer.dweights
                 layer.biases -= learning_rate * layer.dbiases
-        train_preds = np.argmax(network.forward(X_train), axis=1)
-        test_preds = np.argmax(network.forward(X_test), axis=1)
-        train_acc = np.mean(train_preds == y_train)*100
-        test_acc = np.mean(test_preds == y_test)*100
+        train_acc = evaluate(X_train, y_train)
+        test_acc = evaluate(X_test, y_test)
         print(f"{i+1:>6} | {train_acc:>6.2f}% | {test_acc:>6.2f}% | {loss:>8.4f}")
-train(0.01, 50, 64)
+        learning_rate *= 0.95
+        if test_acc > max_acc == 0:
+            max_acc =  test_acc
+            network.save("model.npz")
+train(0.005, 50, 64)
 network.save("model.npz")

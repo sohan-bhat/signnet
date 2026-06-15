@@ -3,11 +3,11 @@ from numpy.ma.core import zeros
 
 # kind of complex so comments for procedure
 class Conv:
-    # initialize filters and one bias per filter
+    # initialize filters (stored as weights for a uniform interface) and one bias per filter
     def __init__(self, num_filters, filter_size, num_channels):
-        self.filters = np.random.randn(num_filters, filter_size, filter_size, num_channels) * 0.1
+        self.weights = np.random.randn(num_filters, filter_size, filter_size, num_channels) * 0.1
         self.biases = np.zeros(num_filters)
-        
+
     def im2col(self, inputs, out_height, out_width, filter_size):
         batch, height, width, channels = inputs.shape
         cols = np.zeros((batch, out_height, out_width, filter_size, filter_size, channels))
@@ -18,30 +18,21 @@ class Conv:
 
     def col2im(self, dcols, inputs_shape, out_height, out_width, filter_size):
         batch, height, width, channels = inputs_shape
-        # Reshape dcols back to the 6D patch structure
         dcols_reshaped = dcols.reshape(batch, out_height, out_width, filter_size, filter_size, channels)
-        
-        # Initialize an empty array for input gradients
         dinputs = np.zeros(inputs_shape)
-        
-        # Accumulate (+=) gradients back into their original overlapping positions
         for i in range(filter_size):
             for j in range(filter_size):
                 dinputs[:, i:i+out_height, j:j+out_width, :] += dcols_reshaped[:, :, :, i, j, :]
         return dinputs
 
-    # slide each filter over the image, dot-product each patch, build feature maps
     def forward(self, inputs):
         self.inputs = inputs
         batch, height, width, channels = inputs.shape
-        num_filters, filter_size = self.filters.shape[0], self.filters.shape[1]
+        num_filters, filter_size = self.weights.shape[0], self.weights.shape[1]
         out_height = height - filter_size + 1
         out_width = width - filter_size + 1
-        # turn patches into a matrix
         self.cols = self.im2col(inputs, out_height, out_width, filter_size)
-        # flatten filters into a matrix: (num_filters, filter_size*filter_size*channels)
-        filters_flat = self.filters.reshape(num_filters, -1)
-        # one matmul does the whole convolution
+        filters_flat = self.weights.reshape(num_filters, -1)
         out = self.cols @ filters_flat.T + self.biases
         self.output = out.reshape(batch, out_height, out_width, num_filters)
         return self.output
@@ -49,12 +40,12 @@ class Conv:
     def backward(self, dvalues):
         dvalues_flat = dvalues.reshape(-1, dvalues.shape[-1])
         self.dbiases = np.sum(dvalues_flat, axis=0)
-        dfilters_flat = self.cols.T @ dvalues_flat
-        self.dfilters = dfilters_flat.T.reshape(self.filters.shape)
-        filters_flat = self.filters.reshape(self.filters.shape[0], -1)
+        dweights_flat = self.cols.T @ dvalues_flat
+        self.dweights = dweights_flat.T.reshape(self.weights.shape)
+        filters_flat = self.weights.reshape(self.weights.shape[0], -1)
         dcols = dvalues_flat @ filters_flat
         _, out_height, out_width, _ = dvalues.shape
-        filter_size = self.filters.shape[1]
+        filter_size = self.weights.shape[1]
         self.dinputs = self.col2im(dcols, self.inputs.shape, out_height, out_width, filter_size)
         return self.dinputs
 
