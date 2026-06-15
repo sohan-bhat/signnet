@@ -1,3 +1,7 @@
 data/
 __pycache__/
 *.pyc
+
+# web app
+web/node_modules/
+web/dist/
