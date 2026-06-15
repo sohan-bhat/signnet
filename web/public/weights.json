@@ -1,0 +1,89 @@
+{
+  "order": [
+    "w0",
+    "b0",
+    "w1",
+    "b1",
+    "w2",
+    "b2",
+    "w3",
+    "b3"
+  ],
+  "totalFloats": 319979,
+  "params": {
+    "w0": {
+      "dtype": "float32",
+      "shape": [
+        32,
+        3,
+        3,
+        3
+      ],
+      "offset": 0,
+      "count": 864
+    },
+    "b0": {
+      "dtype": "float32",
+      "shape": [
+        32
+      ],
+      "offset": 864,
+      "count": 32
+    },
+    "w1": {
+      "dtype": "float32",
+      "shape": [
+        64,
+        3,
+        3,
+        32
+      ],
+      "offset": 896,
+      "count": 18432
+    },
+    "b1": {
+      "dtype": "float32",
+      "shape": [
+        64
+      ],
+      "offset": 19328,
+      "count": 64
+    },
+    "w2": {
+      "dtype": "float32",
+      "shape": [
+        2304,
+        128
+      ],
+      "offset": 19392,
+      "count": 294912
+    },
+    "b2": {
+      "dtype": "float32",
+      "shape": [
+        1,
+        128
+      ],
+      "offset": 314304,
+      "count": 128
+    },
+    "w3": {
+      "dtype": "float32",
+      "shape": [
+        128,
+        43
+      ],
+      "offset": 314432,
+      "count": 5504
+    },
+    "b3": {
+      "dtype": "float32",
+      "shape": [
+        1,
+        43
+      ],
+      "offset": 319936,
+      "count": 43
+    }
+  }
+}
