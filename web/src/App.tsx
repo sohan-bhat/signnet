@@ -9,7 +9,7 @@ import { imageToInput, loadImage } from "./lib/preprocess";
 
 const GITHUB_URL = "https://github.com/sohan-bhat";
 const REPO_URL = "https://github.com/sohan-bhat/signnet";
-const PORTFOLIO_URL = "https://sohanbhat.netlify.app";
+const PORTFOLIO_URL = "https://sohan-bhat.github.io";
 const THINK_MS = 280;
 
 export default function App() {
