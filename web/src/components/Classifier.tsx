@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { DragEvent } from "react";
 import type { Prediction } from "../model/forward";
 import { topK } from "../model/forward";
@@ -13,25 +13,22 @@ export function Classifier({
   status,
   result,
   onFile,
+  onUploadClick,
 }: {
   imageUrl: string | null;
   truthClassId: number | null;
   status: Status;
   result: Prediction | null;
   onFile: (file: File) => void;
+  onUploadClick: () => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-
-  const pickFile = (files: FileList | null) => {
-    const f = files?.[0];
-    if (f && f.type.startsWith("image/")) onFile(f);
-  };
 
   const onDrop = (e: DragEvent) => {
     e.preventDefault();
     setDragging(false);
-    pickFile(e.dataTransfer.files);
+    const f = e.dataTransfer.files?.[0];
+    if (f && f.type.startsWith("image/")) onFile(f);
   };
 
   const top5 = result
@@ -57,9 +54,12 @@ export function Classifier({
           className={`image-stage interactive${dragging ? " dragging" : ""}`}
           role="button"
           tabIndex={0}
-          onClick={() => inputRef.current?.click()}
+          onClick={onUploadClick}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onUploadClick();
+            }
           }}
           onDragOver={(e) => {
             e.preventDefault();
@@ -95,14 +95,6 @@ export function Classifier({
             </div>
           )}
         </div>
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={(e) => pickFile(e.target.files)}
-        />
       </div>
 
       <div className="panel">

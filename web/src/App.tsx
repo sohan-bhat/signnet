@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Logo } from "./components/Logo";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Classifier, type Status } from "./components/Classifier";
+import { Disclaimer } from "./components/Disclaimer";
 import { Gallery, type SampleItem } from "./components/Gallery";
 import { loadWeights, type ModelWeights } from "./model/weights";
 import { predict, type Prediction } from "./model/forward";
@@ -24,6 +25,13 @@ export default function App() {
   const [result, setResult] = useState<Prediction | null>(null);
 
   const objectUrlRef = useRef<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingUploadRef = useRef(false);
+
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(
+    () => localStorage.getItem("signnet-custom-ack") === "1"
+  );
 
   useEffect(() => {
     loadWeights().then(setWeights).catch((e) => setLoadError(String(e)));
@@ -66,13 +74,35 @@ export default function App() {
 
   const handleFile = useCallback(
     (file: File) => {
+      if (!acknowledged) setShowDisclaimer(true);
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
       const url = URL.createObjectURL(file);
       objectUrlRef.current = url;
       void handleUrl(url, null, null);
     },
-    [handleUrl]
+    [handleUrl, acknowledged]
   );
+
+  // Clicking the image to upload: show the disclaimer first (before the OS file
+  // picker) if it hasn't been acknowledged yet; otherwise open the picker.
+  const handleUploadClick = useCallback(() => {
+    if (!acknowledged) {
+      pendingUploadRef.current = true;
+      setShowDisclaimer(true);
+    } else {
+      fileInputRef.current?.click();
+    }
+  }, [acknowledged]);
+
+  const acknowledgeDisclaimer = useCallback(() => {
+    setShowDisclaimer(false);
+    setAcknowledged(true);
+    localStorage.setItem("signnet-custom-ack", "1");
+    if (pendingUploadRef.current) {
+      pendingUploadRef.current = false;
+      fileInputRef.current?.click();
+    }
+  }, []);
 
   const handleSample = useCallback(
     (s: SampleItem) => void handleUrl(`/samples/${s.file}`, s.classId, s.file),
@@ -105,6 +135,18 @@ export default function App() {
 
   return (
     <div className="app" id="top">
+      {showDisclaimer && <Disclaimer onAcknowledge={acknowledgeDisclaimer} />}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f && f.type.startsWith("image/")) handleFile(f);
+          e.target.value = "";
+        }}
+      />
       <header className="topbar">
         <div className="container topbar-inner">
           <Logo />
@@ -145,6 +187,7 @@ export default function App() {
           status={status}
           result={result}
           onFile={handleFile}
+          onUploadClick={handleUploadClick}
         />
         {loadError && (
           <p style={{ color: "var(--text-faint)", fontSize: "0.85rem", marginTop: 12 }}>
