@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Logo } from "./components/Logo";
-import { ThemeToggle } from "./components/ThemeToggle";
-import { Classifier, type Status } from "./components/Classifier";
+import { Classifier } from "./components/Classifier";
 import { Disclaimer } from "./components/Disclaimer";
 import { Gallery, type SampleItem } from "./components/Gallery";
 import { loadWeights, type ModelWeights } from "./model/weights";
@@ -11,7 +10,18 @@ import { imageToInput, loadImage } from "./lib/preprocess";
 const GITHUB_URL = "https://github.com/sohan-bhat";
 const REPO_URL = "https://github.com/sohan-bhat/signnet";
 const PORTFOLIO_URL = "https://sohan-bhat.github.io";
-const THINK_MS = 280;
+const ACK_KEY = "signnet-custom-ack";
+
+const ARCHITECTURE = [
+  { layer: "Input", shape: "32 × 32 × 3", io: true },
+  { layer: "Conv 3×3, 32 filters + ReLU", shape: "30 × 30 × 32" },
+  { layer: "MaxPool 2×2", shape: "15 × 15 × 32" },
+  { layer: "Conv 3×3, 64 filters + ReLU", shape: "13 × 13 × 64" },
+  { layer: "MaxPool 2×2", shape: "6 × 6 × 64" },
+  { layer: "Flatten", shape: "2304" },
+  { layer: "Dense 128 + ReLU", shape: "128" },
+  { layer: "Dense 43 + Softmax", shape: "43", io: true },
+];
 
 export default function App() {
   const [weights, setWeights] = useState<ModelWeights | null>(null);
@@ -21,7 +31,6 @@ export default function App() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [truthClassId, setTruthClassId] = useState<number | null>(null);
   const [activeFile, setActiveFile] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<Prediction | null>(null);
 
   const objectUrlRef = useRef<string | null>(null);
@@ -30,7 +39,7 @@ export default function App() {
 
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [acknowledged, setAcknowledged] = useState(
-    () => localStorage.getItem("signnet-custom-ack") === "1"
+    () => localStorage.getItem(ACK_KEY) === "1"
   );
 
   useEffect(() => {
@@ -41,19 +50,6 @@ export default function App() {
       .catch(() => setSamples([]));
   }, []);
 
-  const runPrediction = useCallback(
-    async (src: HTMLImageElement, w: ModelWeights) => {
-      setStatus("thinking");
-
-      await new Promise((res) => setTimeout(res, THINK_MS));
-      const input = imageToInput(src);
-      const out = predict(input, w);
-      setResult(out);
-      setStatus("ready");
-    },
-    []
-  );
-
   const handleUrl = useCallback(
     async (url: string, truth: number | null, file: string | null) => {
       if (!weights) return;
@@ -63,13 +59,12 @@ export default function App() {
       setResult(null);
       try {
         const img = await loadImage(url);
-        await runPrediction(img, weights);
+        setResult(predict(imageToInput(img), weights));
       } catch (e) {
         setLoadError(String(e));
-        setStatus("idle");
       }
     },
-    [weights, runPrediction]
+    [weights]
   );
 
   const handleFile = useCallback(
@@ -83,8 +78,6 @@ export default function App() {
     [handleUrl, acknowledged]
   );
 
-  // Clicking the image to upload: show the disclaimer first (before the OS file
-  // picker) if it hasn't been acknowledged yet; otherwise open the picker.
   const handleUploadClick = useCallback(() => {
     if (!acknowledged) {
       pendingUploadRef.current = true;
@@ -97,7 +90,7 @@ export default function App() {
   const acknowledgeDisclaimer = useCallback(() => {
     setShowDisclaimer(false);
     setAcknowledged(true);
-    localStorage.setItem("signnet-custom-ack", "1");
+    localStorage.setItem(ACK_KEY, "1");
     if (pendingUploadRef.current) {
       pendingUploadRef.current = false;
       fileInputRef.current?.click();
@@ -150,101 +143,121 @@ export default function App() {
       <header className="topbar">
         <div className="container topbar-inner">
           <Logo />
-          <div className="topbar-links">
+          <nav className="topbar-links">
             <a className="topbar-link hide-mobile" href="#classifier">
               Classifier
             </a>
             <a className="topbar-link hide-mobile" href="#about">
               About
             </a>
-            <a className="topbar-link" href={GITHUB_URL} target="_blank" rel="noreferrer">
+            <a className="topbar-link" href={REPO_URL} target="_blank" rel="noreferrer">
               GitHub
             </a>
-            <ThemeToggle />
-          </div>
+          </nav>
         </div>
       </header>
 
       <section className="hero container">
-        <h1>
-          Traffic signs, classified by a network <br />
-          built <span className="grad">from scratch</span>.
-        </h1>
-        <p className="hero-tagline">
-          A convolutional neural network built from scratch, classifying German traffic signs.
-        </p>
-        <div className="hero-actions">
-          <a className="btn btn-primary" href={REPO_URL} target="_blank" rel="noreferrer">
-            View source
-          </a>
+        <div>
+          <div className="hero-eyebrow">Convolutional neural network · NumPy only</div>
+          <h1>Traffic sign classification, built from scratch.</h1>
+          <p className="hero-tagline">
+            SignNet recognizes 43 German traffic sign types. Every layer, including
+            backpropagation, is written by hand in NumPy. This page runs the trained model
+            directly in your browser.
+          </p>
+          <div className="hero-actions">
+            <a className="btn btn-primary" href="#classifier">
+              Try the classifier
+            </a>
+            <a className="btn btn-secondary" href={REPO_URL} target="_blank" rel="noreferrer">
+              View source
+            </a>
+          </div>
         </div>
+        <dl className="spec-list">
+          <div>
+            <dt>Test accuracy</dt>
+            <dd>90.06%</dd>
+          </div>
+          <div>
+            <dt>Test images</dt>
+            <dd>12,630</dd>
+          </div>
+          <div>
+            <dt>Sign classes</dt>
+            <dd>43</dd>
+          </div>
+          <div>
+            <dt>Parameters</dt>
+            <dd>320K</dd>
+          </div>
+          <div>
+            <dt>Input size</dt>
+            <dd>32 × 32 RGB</dd>
+          </div>
+        </dl>
       </section>
 
-      <section className="container" id="classifier" style={{ scrollMarginTop: 80 }}>
+      <section className="section container" id="classifier" style={{ scrollMarginTop: 24 }}>
+        <div className="section-head">
+          <h2>Classifier</h2>
+          <p>Upload a sign or pick a sample. Inference runs locally, nothing is sent anywhere.</p>
+        </div>
         <Classifier
           imageUrl={imageUrl}
           truthClassId={truthClassId}
-          status={status}
           result={result}
           onFile={handleFile}
           onUploadClick={handleUploadClick}
         />
-        {loadError && (
-          <p style={{ color: "var(--text-faint)", fontSize: "0.85rem", marginTop: 12 }}>
-            {loadError}
-          </p>
-        )}
+        {loadError && <p className="load-error">{loadError}</p>}
       </section>
 
       <section className="section container">
         <div className="section-head">
           <h2>Sample test images</h2>
-          <p>
-            One held-out GTSRB test image per class. Click any sign to classify it instantly.
-          </p>
+          <p>One held-out GTSRB test image per class. Click any sign to classify it.</p>
         </div>
         <Gallery samples={samples} activeFile={activeFile} onPick={handleSample} />
       </section>
 
-      <section className="about" id="about" style={{ scrollMarginTop: 64 }}>
+      <section className="about" id="about">
         <div className="container about-grid">
           <div>
-            <h3>Built from scratch</h3>
+            <h2>About the model</h2>
             <p>
               SignNet is a convolutional neural network written in NumPy: convolution, max
-              pooling, dense layers, ReLU, softmax, and the backpropagation training loop. It
-              reaches about 90% accuracy on the GTSRB test set across all 43 classes.
+              pooling, dense layers, ReLU, softmax, and the backpropagation training loop. No
+              PyTorch, no TensorFlow, no autograd. It reaches 90.06% accuracy on the GTSRB test
+              set across all 43 classes.
             </p>
             <p>
-              This page reimplements the same forward pass in TypeScript. The trained weights
-              come directly from the NumPy model, and the JavaScript predictions match the
+              Convolution is implemented with im2col, unfolding image patches into a matrix so
+              the whole operation becomes a single matrix multiply. That is what makes training
+              on a CPU practical.
+            </p>
+            <p>
+              This page reimplements the same forward pass in TypeScript. The weights are
+              exported directly from the NumPy model, and the browser predictions match the
               Python ones to within about 1e-6 on identical inputs.
             </p>
           </div>
-          <div className="stat-grid">
-            <div className="stat">
-              <div className="num mono">~90%</div>
-              <div className="lbl">Test accuracy</div>
-            </div>
-            <div className="stat">
-              <div className="num mono">43</div>
-              <div className="lbl">Sign classes</div>
-            </div>
-            <div className="stat">
-              <div className="num mono">320K</div>
-              <div className="lbl">Parameters</div>
-            </div>
-            <div className="stat">
-              <div className="num mono">32×32</div>
-              <div className="lbl">Input size</div>
-            </div>
+          <div className="arch">
+            <div className="arch-title">Architecture</div>
+            {ARCHITECTURE.map((row) => (
+              <div className={`arch-row${row.io ? " io" : ""}`} key={row.layer}>
+                <span className="layer">{row.layer}</span>
+                <span className="shape">{row.shape}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <footer className="footer">
         <div className="container footer-inner">
-          <span>signnet · Built by Sohan Bhat</span>
+          <span>SignNet · Sohan Bhat</span>
           <div className="footer-links">
             <a href={GITHUB_URL} target="_blank" rel="noreferrer">
               GitHub

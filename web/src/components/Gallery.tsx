@@ -16,19 +16,16 @@ export function Gallery({
 }) {
   return (
     <div className="gallery">
-      {samples.map((s) => {
-        const url = `/samples/${s.file}`;
-        return (
-          <button
-            key={s.file}
-            className={`sample${activeFile === s.file ? " active" : ""}`}
-            onClick={() => onPick(s)}
-            title={`${signName(s.classId)}, click to classify`}
-          >
-            <img src={url} alt={signName(s.classId)} loading="lazy" />
-          </button>
-        );
-      })}
+      {samples.map((s) => (
+        <button
+          key={s.file}
+          className={`sample${activeFile === s.file ? " active" : ""}`}
+          onClick={() => onPick(s)}
+          title={signName(s.classId)}
+        >
+          <img src={`/samples/${s.file}`} alt={signName(s.classId)} loading="lazy" />
+        </button>
+      ))}
     </div>
   );
 }

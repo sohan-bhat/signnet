@@ -16,7 +16,6 @@ MODEL_PATH = "models/model_90.npz"
 SAMPLE_COUNT = 14          # how many example signs to show in the table
 BATCH = 64                 # batch size for memory-safe evaluation
 
-# ---- the 43 GTSRB class names (index -> readable label) ----
 SIGN_NAMES = {
     0: "Speed limit (20km/h)", 1: "Speed limit (30km/h)", 2: "Speed limit (50km/h)",
     3: "Speed limit (60km/h)", 4: "Speed limit (70km/h)", 5: "Speed limit (80km/h)",
@@ -34,7 +33,6 @@ SIGN_NAMES = {
     41: "End of no passing", 42: "End of no passing >3.5t",
 }
 
-# ---- ANSI truecolor styling (SignNet orange theme) ----
 O = "\033[38;2;240;140;50m"    # orange accent
 G = "\033[38;2;45;205;160m"    # emerald / blue-green (correct)
 R = "\033[38;2;235;95;95m"     # red (wrong)
@@ -100,14 +98,12 @@ def main():
     # full-set accuracy (the headline number)
     test_acc = evaluate_full(network, X_test, y_test)
 
-    # sample predictions
     idxs = pick_samples(y_test, SAMPLE_COUNT)
     probs = softmax(network.forward(X_test[idxs]))
     preds = np.argmax(probs, axis=1)
     confs = probs[np.arange(len(idxs)), preds]
     truths = y_test[idxs]
 
-    # ---- render ----
     line = D + "\u2500" * 66 + X
     print()
     print("  " + O + B + "\u25b2 " + W + B + "SignNet" + X
@@ -130,7 +126,7 @@ def main():
               + barcol + conf_bar(float(c)) + X
               + W + f" {c*100:5.1f}%" + X
               + "  " + mark)
-        print()  # blank line separates each bar
+        print()
 
     print("  " + line)
     print("  " + W + B + "Test accuracy (full 12,630-image set): " + O + f"{test_acc:.2f}%" + X)

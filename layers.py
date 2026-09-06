@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.ma.core import zeros
 
-# kind of complex so comments for procedure
 class Conv:
     # initialize filters (stored as weights for a uniform interface) and one bias per filter
     def __init__(self, num_filters, filter_size, num_channels):
@@ -81,7 +80,6 @@ class MaxPool:
                 grad = dvalues[:,h, w,:][:,None, None,:]
                 self.dinputs[:, hpool_size:hpool_size+self.pool_size, wpool_size:wpool_size+self.pool_size, :] += mask * grad
 
-# helper to flatten
 class Flatten:
     def forward(self, inputs):
         self.input_shape = inputs.shape

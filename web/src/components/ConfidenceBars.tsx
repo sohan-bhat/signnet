@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { signName } from "../lib/labels";
 
 export interface BarEntry {
@@ -13,19 +12,11 @@ export function ConfidenceBars({
   entries: BarEntry[];
   truthClassId: number | null;
 }) {
-  const [grown, setGrown] = useState(false);
-
-  useEffect(() => {
-    setGrown(false);
-    const id = requestAnimationFrame(() => requestAnimationFrame(() => setGrown(true)));
-    return () => cancelAnimationFrame(id);
-  }, [entries]);
-
   const fillColor = (entry: BarEntry, index: number) => {
     if (truthClassId === null) {
       return index === 0 ? "var(--accent)" : "var(--border-strong)";
     }
-    return entry.classId === truthClassId ? "var(--mint)" : "var(--red)";
+    return entry.classId === truthClassId ? "var(--ok)" : "var(--bad)";
   };
 
   return (
@@ -38,8 +29,7 @@ export function ConfidenceBars({
             <div
               className="bar-fill"
               style={{
-                width: grown ? `${Math.max(e.prob * 100, 0.6)}%` : "0%",
-                transitionDelay: `${i * 60}ms`,
+                width: `${Math.max(e.prob * 100, 0.6)}%`,
                 background: fillColor(e, i),
               }}
             />
