@@ -1,6 +1,5 @@
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
+@import "@fontsource/barlow/400.css";
+@import "@fontsource/barlow/500.css";
 @import "@fontsource/barlow/600.css";
 @import "@fontsource/barlow/700.css";
 @import "@fontsource/jetbrains-mono/400.css";
@@ -24,8 +23,8 @@
   --radius: 6px;
   --maxw: 1080px;
 
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Barlow", "Inter", system-ui, sans-serif;
+  --font-sans: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Barlow", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   color-scheme: light;
