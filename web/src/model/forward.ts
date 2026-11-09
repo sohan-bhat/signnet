@@ -117,26 +117,34 @@ export function softmax(logits: Float32Array): Float32Array {
   return out;
 }
 
+export interface Activations {
+  input: Tensor3;
+  conv1: Tensor3;
+  pool1: Tensor3;
+  conv2: Tensor3;
+  pool2: Tensor3;
+  dense: Float32Array;
+}
+
 export interface Prediction {
   logits: Float32Array;
   probs: Float32Array;
   pred: number;
+  activations: Activations;
 }
 
 export function predict(input32: Float32Array, weights: ModelWeights): Prediction {
-  let t: Tensor3 = { data: input32, h: 32, w: 32, c: 3 };
+  const input: Tensor3 = { data: input32, h: 32, w: 32, c: 3 };
 
-  t = conv(t, weights.w0, weights.b0, 32, 3);
-  relu(t);
-  t = maxpool2(t);
+  const conv1 = relu(conv(input, weights.w0, weights.b0, 32, 3));
+  const pool1 = maxpool2(conv1);
 
-  t = conv(t, weights.w1, weights.b1, 64, 3);
-  relu(t);
-  t = maxpool2(t);
+  const conv2 = relu(conv(pool1, weights.w1, weights.b1, 64, 3));
+  const pool2 = maxpool2(conv2);
 
-  const flat = flatten(t);
+  const flat = flatten(pool2);
 
-  let v = dense(flat, weights.w2, weights.b2, 128);
+  const v = dense(flat, weights.w2, weights.b2, 128);
 
   for (let i = 0; i < v.length; i++) if (v[i] < 0) v[i] = 0;
 
@@ -146,7 +154,12 @@ export function predict(input32: Float32Array, weights: ModelWeights): Predictio
   let pred = 0;
   for (let i = 1; i < logits.length; i++) if (logits[i] > logits[pred]) pred = i;
 
-  return { logits, probs, pred };
+  return {
+    logits,
+    probs,
+    pred,
+    activations: { input, conv1, pool1, conv2, pool2, dense: v },
+  };
 }
 
 export function topK(probs: Float32Array, k: number): number[] {
