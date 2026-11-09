@@ -15,15 +15,16 @@ export function Gallery({
   onPick: (sample: SampleItem) => void;
 }) {
   return (
-    <div className="gallery">
+    <div className="picker">
       {samples.map((s) => (
         <button
+          type="button"
           key={s.file}
-          className={`sample${activeFile === s.file ? " active" : ""}`}
+          className="sample"
+          aria-pressed={activeFile === s.file}
           onClick={() => onPick(s)}
-          title={signName(s.classId)}
         >
-          <img src={`/samples/${s.file}`} alt={signName(s.classId)} loading="lazy" />
+          <img src={`/samples/${s.file}`} alt={signName(s.classId)} width={48} height={48} />
         </button>
       ))}
     </div>

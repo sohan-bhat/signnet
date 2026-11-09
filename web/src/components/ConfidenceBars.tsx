@@ -5,6 +5,8 @@ export interface BarEntry {
   prob: number;
 }
 
+const ROWS = 5;
+
 export function ConfidenceBars({
   entries,
   truthClassId,
@@ -12,30 +14,31 @@ export function ConfidenceBars({
   entries: BarEntry[];
   truthClassId: number | null;
 }) {
-  const fillColor = (entry: BarEntry, index: number) => {
-    if (truthClassId === null) {
-      return index === 0 ? "var(--accent)" : "var(--border-strong)";
-    }
-    return entry.classId === truthClassId ? "var(--ok)" : "var(--bad)";
+  const tone = (entry: BarEntry, index: number) => {
+    if (truthClassId === null) return index === 0 ? "ink" : "";
+    if (entry.classId === truthClassId) return index === 0 ? "ink" : "ok";
+    return index === 0 ? "bad" : "";
   };
 
   return (
-    <div className="bars">
-      {entries.map((e, i) => (
-        <div className={`bar-row${i === 0 ? " top" : ""}`} key={e.classId}>
-          <span className="bar-label">{signName(e.classId)}</span>
-          <span className="bar-value mono">{(e.prob * 100).toFixed(1)}%</span>
-          <div className="bar-track">
-            <div
-              className="bar-fill"
-              style={{
-                width: `${Math.max(e.prob * 100, 0.6)}%`,
-                background: fillColor(e, i),
-              }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
+    <ol className="bars">
+      {Array.from({ length: ROWS }, (_, i) => {
+        const e = entries[i];
+        return (
+          <li className={`bar-row${i === 0 ? " top" : ""}`} key={i}>
+            <span className="bar-label">
+              <span>{e ? signName(e.classId) : ""}</span>
+            </span>
+            <span className="bar-value mono">{e ? `${(e.prob * 100).toFixed(1)}%` : ""}</span>
+            <span className="bar-track">
+              <span
+                className={`bar-fill ${e ? tone(e, i) : "empty"}`}
+                style={{ width: e ? `${e.prob * 100}%` : "100%" }}
+              />
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

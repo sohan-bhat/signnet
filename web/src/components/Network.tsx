@@ -80,7 +80,7 @@ function MapRow({ tensor, color }: { tensor: Tensor3 | null; color?: boolean }) 
   }, [tensor, color, count]);
 
   return (
-    <div className="maps">
+    <div className="maps" aria-hidden="true">
       {Array.from({ length: color ? count + 1 : count }, (_, i) => (
         <canvas key={i} ref={(el) => (refs.current[i] = el)} width={1} height={1} />
       ))}
@@ -96,7 +96,7 @@ function Strip({ values, mark }: { values: Float32Array | null; mark?: number | 
   }, [values]);
 
   return (
-    <div className="strip">
+    <div className="strip" aria-hidden="true">
       <canvas ref={ref} width={1} height={1} />
       {mark != null && values && (
         <span

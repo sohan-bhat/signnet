@@ -20,7 +20,7 @@ export function Cone({ size = 22 }: { size?: number }) {
 
 export function Logo() {
   return (
-    <a href="#top" className="wordmark" aria-label="SignNet home">
+    <a href="/" className="wordmark" aria-label="SignNet home">
       <Cone />
       <span>SignNet</span>
     </a>
