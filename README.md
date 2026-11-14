@@ -60,3 +60,5 @@ The web demo loads the exported weights and runs the same forward pass in the br
 ## Notes
 
 The model overfits a little (it scores higher on training data than test data), which is expected for a network this size without data augmentation. Adding augmentation is the next step toward the mid-90s.
+
+Built by [Sohan Bhat](https://sohanbhat.me/).
