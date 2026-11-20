@@ -4,6 +4,7 @@ import { Classifier } from "./components/Classifier";
 import { Gallery, type SampleItem } from "./components/Gallery";
 import { Network, type LayerSpec } from "./components/Network";
 import { loadWeights, type ModelWeights } from "./model/weights";
+import { BASE } from "./lib/base";
 import { predict, type Prediction } from "./model/forward";
 import { imageToInput, loadImage } from "./lib/preprocess";
 
@@ -40,8 +41,8 @@ export default function App() {
   const autoRef = useRef(false);
 
   useEffect(() => {
-    loadWeights().then(setWeights).catch((e) => setLoadError(String(e)));
-    fetch("/samples/manifest.json")
+    loadWeights(BASE).then(setWeights).catch((e) => setLoadError(String(e)));
+    fetch(`${BASE}/samples/manifest.json`)
       .then((r) => r.json())
       .then((list: SampleItem[]) => setSamples(list.sort((a, b) => a.classId - b.classId)))
       .catch(() => setSamples([]));
@@ -75,7 +76,7 @@ export default function App() {
   );
 
   const handleSample = useCallback(
-    (s: SampleItem) => void handleUrl(`/samples/${s.file}`, s.classId, s.file),
+    (s: SampleItem) => void handleUrl(`${BASE}/samples/${s.file}`, s.classId, s.file),
     [handleUrl]
   );
 

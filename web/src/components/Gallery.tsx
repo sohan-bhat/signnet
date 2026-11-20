@@ -1,3 +1,4 @@
+import { BASE } from "../lib/base";
 import { signName } from "../lib/labels";
 
 export interface SampleItem {
@@ -24,7 +25,7 @@ export function Gallery({
           aria-pressed={activeFile === s.file}
           onClick={() => onPick(s)}
         >
-          <img src={`/samples/${s.file}`} alt={signName(s.classId)} width={48} height={48} />
+          <img src={`${BASE}/samples/${s.file}`} alt={signName(s.classId)} width={48} height={48} />
         </button>
       ))}
     </div>
