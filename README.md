@@ -2,7 +2,7 @@
 
 A convolutional neural network that classifies German traffic signs into 43 categories (stop signs, speed limits, yield, and so on). The network, including backpropagation, is written directly in NumPy with no deep learning frameworks: no PyTorch, no TensorFlow, no autograd.
 
-**Live demo:** https://signnet-cnn.netlify.app
+**Live demo:** https://sohanbhat.me/signnet/
 
 ![SignNet predictions](docs/showcase.png)
 

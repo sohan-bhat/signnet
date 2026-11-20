@@ -89,17 +89,15 @@ identical; only genuinely borderline images may flip. The verification above
 deliberately bypasses this by comparing on identical pre-resized tensors, isolating
 forward-pass math from the resize filter.
 
-## Deployment (Netlify)
+## Deployment (GitHub Pages)
 
-`netlify.toml` is configured for the `web/` subdirectory:
+The site is served at https://sohanbhat.me/signnet/. Every push to `main` runs
+`.github/workflows/pages.yml`, which builds `web/` and publishes `web/dist`.
 
-```toml
-[build]
-  base = "web"
-  command = "npm run build"
-  publish = "dist"
-```
+Because the site sits in a folder, the workflow builds with `SITE_BASE=/signnet/`.
+`vite.config.ts` uses that as Vite's `base`, and the app loads the weights and the
+sample signs from `import.meta.env.BASE_URL` (see `src/lib/base.ts`). Without
+`SITE_BASE`, as in `npm run dev`, everything is served from the root.
 
 Everything in `public/` (weights, samples) is copied verbatim into `dist/`, so the
-deployed site is fully static. Point Netlify at this repo (or drag-and-drop
-`web/dist`) and it just works.
+deployed site is fully static.
