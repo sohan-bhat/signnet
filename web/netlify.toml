@@ -1,3 +1,6 @@
+# The site moved to https://sohanbhat.me/signnet/, where GitHub Pages serves
+# it. Netlify still builds this folder, but only to send every request for
+# the old address, signnet-cnn.netlify.app, to the new one.
 [build]
   base = "web"
   command = "npm run build"
@@ -5,3 +8,9 @@
 
 [build.environment]
   NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "https://sohanbhat.me/signnet/:splat"
+  status = 301
+  force = true
