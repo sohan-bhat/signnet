@@ -140,7 +140,7 @@ export default function App() {
           <div className="intro">
             <h1>Traffic sign classification, built from scratch.</h1>
             <p className="lede">
-              A convolutional network written by hand in NumPy, running in your browser.
+              A convolutional network in pure math with NumPy, running in your browser.
             </p>
           </div>
 
