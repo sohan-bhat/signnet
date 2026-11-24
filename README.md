@@ -10,7 +10,7 @@ It reaches **90.06% accuracy** on the GTSRB test set (12,630 images it never saw
 
 ## How it works
 
-Every layer is implemented by hand. The forward pass is plain matrix math; the backward pass derives and applies the gradients manually, layer by layer. The convolution is the interesting part: rather than looping over every position in Python, patches are unfolded into a matrix (im2col) so the whole convolution becomes a single matrix multiply, which is what makes training on a CPU practical.
+Every layer is implemented in pure math. The forward pass is plain matrix math; the backward pass derives and applies the gradients layer by layer. The convolution is the interesting part: rather than looping over every position in Python, patches are unfolded into a matrix (im2col) so the whole convolution becomes a single matrix multiply, which is what makes training on a CPU practical.
 
 The pipeline:
 
