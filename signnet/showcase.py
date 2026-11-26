@@ -2,7 +2,7 @@
 showcase.py - loads the trained SignNet model and prints a clean,
 colored table of predictions on real GTSRB test images.
 
-Run from the signnet/ folder:  python3 showcase.py
+Run from the repo root:  python3 signnet/showcase.py
 Reuses your existing data.py / layers.py / network.py so the
 forward math is identical to what was trained.
 """

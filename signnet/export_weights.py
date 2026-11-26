@@ -12,7 +12,7 @@ Outputs:
   web/public/samples/manifest.json  [{classId, file}]
   web/src/model/fixtures.json       [{file, classId, input32, logits, probs, pred}]
 
-Run:  python3 export_weights.py
+Run:  python3 signnet/export_weights.py
 """
 import json
 import os
@@ -26,7 +26,7 @@ from layers import Conv, Dense, Flatten, MaxPool, ReLU
 from losses import Softmax
 from network import Network
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(ROOT, "models", "model_90.npz")
 TEST_CSV = os.path.join(ROOT, "data", "Test.csv")
 DATA_DIR = os.path.join(ROOT, "data")
