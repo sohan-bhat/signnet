@@ -10,7 +10,7 @@ Outputs:
   web/public/weights.json           manifest: key -> {dtype, shape, offset, count}
   web/public/samples/<classId>.png  one display image per class (0..42)
   web/public/samples/manifest.json  [{classId, file}]
-  web/public/verify/fixtures.json   [{file, classId, input32, logits, probs, pred}]
+  web/src/model/fixtures.json       [{file, classId, input32, logits, probs, pred}]
 
 Run:  python3 export_weights.py
 """
@@ -36,7 +36,7 @@ WEB_PUBLIC = os.path.join(WEB_DIR, "public")
 SAMPLES_DIR = os.path.join(WEB_PUBLIC, "samples")
 # Verification fixtures live outside public/ so they are not shipped in the build;
 # only `npm run verify` reads them.
-VERIFY_DIR = os.path.join(WEB_DIR, "verify")
+VERIFY_DIR = os.path.join(WEB_DIR, "src", "model")
 
 NUM_CLASSES = 43
 DISPLAY_SIZE = 128          # size saved for the gallery thumbnails

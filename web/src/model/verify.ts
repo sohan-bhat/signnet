@@ -8,7 +8,7 @@ import type { WeightManifest } from "./weights";
 const here = dirname(fileURLToPath(import.meta.url));
 const WEB = join(here, "..", "..");
 const PUBLIC = join(WEB, "public");
-const FIXTURES = join(WEB, "verify", "fixtures.json");
+const FIXTURES = join(here, "fixtures.json");
 
 interface Fixture {
   file: string;

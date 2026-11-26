@@ -31,7 +31,7 @@ the app needs into `web/public/`:
 | `public/weights.json` | Manifest: each param's `shape`, element `offset`, `count` |
 | `public/samples/<id>.png` | One held-out GTSRB test image per class (0–42) |
 | `public/samples/manifest.json` | `[{classId, file}]` for the gallery |
-| `web/verify/fixtures.json` | Pre-resized 32×32 inputs + Python `logits`/`probs`/`pred` for verification (not shipped to `dist`) |
+| `web/src/model/fixtures.json` | Pre-resized 32×32 inputs + Python `logits`/`probs`/`pred` for verification (not shipped to `dist`) |
 
 ## Architecture (reimplemented in `src/model/forward.ts`)
 
