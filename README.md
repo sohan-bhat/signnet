@@ -37,12 +37,12 @@ Getting from one conv block to two was what pushed accuracy from the high 80s pa
 
 | File | Purpose |
 |------|---------|
-| `data.py` | Loads and preprocesses the GTSRB dataset |
-| `layers.py` | Conv, MaxPool, Flatten, Dense, ReLU (forward + backward) |
-| `losses.py` | Softmax and cross-entropy |
-| `network.py` | Assembles layers, runs forward/backward, saves/loads weights |
-| `train.py` | Training loop |
-| `showcase.py` | Loads the trained model and prints sample predictions |
+| `signnet/data.py` | Loads and preprocesses the GTSRB dataset |
+| `signnet/layers.py` | Conv, MaxPool, Flatten, Dense, ReLU (forward + backward) |
+| `signnet/losses.py` | Softmax and cross-entropy |
+| `signnet/network.py` | Assembles layers, runs forward/backward, saves/loads weights |
+| `signnet/train.py` | Training loop |
+| `signnet/showcase.py` | Loads the trained model and prints sample predictions |
 | `web/` | The browser demo (runs the trained model in JavaScript, no server) |
 | `models/` | Saved weights |
 
@@ -51,8 +51,8 @@ Getting from one conv block to two was what pushed accuracy from the high 80s pa
 Download GTSRB from [Kaggle](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign) and place the `Train/`, `Test/`, and CSV files in a `data/` folder (kept out of the repo because of its size).
 
 ```bash
-python3 train.py       # trains and saves weights to models/
-python3 showcase.py    # loads the trained model, prints predictions
+python3 signnet/train.py       # trains and saves weights to models/
+python3 signnet/showcase.py    # loads the trained model, prints predictions
 ```
 
 The web demo loads the exported weights and runs the same forward pass in the browser, so it reflects whatever model is currently saved.

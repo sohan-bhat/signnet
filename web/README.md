@@ -11,7 +11,7 @@ Built with **Vite + React + TypeScript**. Deployable to Netlify as static files.
 
 ```bash
 # from the repo root, regenerate weights + samples + verification fixtures
-python3 export_weights.py
+python3 signnet/export_weights.py
 
 # then build/run the web app
 cd web
@@ -22,7 +22,7 @@ npm run build    # production build -> web/dist
 npm run preview  # serve the production build
 ```
 
-`export_weights.py` (repo root) reads `models/model_90.npz` and writes everything
+`signnet/export_weights.py` reads `models/model_90.npz` and writes everything
 the app needs into `web/public/`:
 
 | Output | Contents |
@@ -53,13 +53,13 @@ Input 32×32×3  (RGB, ÷255)
  → Softmax → argmax
 ```
 
-Key correctness details that mirror the Python (`layers.py`):
+Key correctness details that mirror the Python (`signnet/layers.py`):
 
 - **Valid cross-correlation, no kernel flip:** `out[oh,ow,f] = Σ_{i,j,c} in[oh+i,ow+j,c]·W[f,i,j,c] + b[f]`.
   The patch flatten order `(i,j,c)` matches `weights.reshape(num_filters, -1)`.
 - **Flatten** is a no-op reorder: tensors are already HWC C-order, identical to
   `arr.reshape(batch, -1)` over `(h, w, c)`.
-- **Softmax** subtracts the row max for numerical stability (matches `losses.py`).
+- **Softmax** subtracts the row max for numerical stability (matches `signnet/losses.py`).
 
 ## Verification & discrepancies
 
